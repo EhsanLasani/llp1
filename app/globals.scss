@@ -1,0 +1,20 @@
+@import 'carbon-components/scss/globals/scss/styles.scss';
+[data-theme="carbon-g10"] {
+  --color-bg: #F4F4F4;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #E5E5E5;
+  --color-text: #161616;
+  --color-text-secondary: #555;
+  // ... all your Carbon tokens
+}
+[data-theme="material-light"] {
+  --color-bg: #FAFAFA;
+  --color-surface: #FFF;
+  --color-accent: #2196F3;
+  // ...tokens for Material
+}
+[data-theme="uber-dark"] {
+  --color-bg: #222;
+  --color-surface: #333;
+  // ...tokens for Uber, etc.
+}
