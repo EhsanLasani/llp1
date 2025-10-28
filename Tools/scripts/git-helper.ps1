@@ -60,3 +60,5 @@ function Invoke-GitCommitPush {
 }
 
 Set-Alias -Name gcp -Value Invoke-GitCommitPush
+# Example usage:
+# gcp -Message "Your commit message here"
