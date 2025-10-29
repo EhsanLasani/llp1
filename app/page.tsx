@@ -14,7 +14,10 @@ export default function Home() {
           subtitle="Testing areas under headers"
         />
         <SectionContainer heading="Latest">
-          <p>Lasani Fluid Power LLP website preparation</p>
+          <h1>section no 1Lasani Fluid Power LLP website preparation</h1>
+        </SectionContainer>
+        <SectionContainer heading="Latest">
+          <h1>section no 2</h1>
         </SectionContainer>
       </BodyContainer>
     </PageContainer>
