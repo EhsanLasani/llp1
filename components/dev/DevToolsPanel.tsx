@@ -1,26 +1,151 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+/**
+ * DevToolsPanel
+ * - Dev-only floating panel (open with FAB ⚙️)
+ * - Theme switcher (name + mode)
+ * - Per-scope overrides (route + container + element)
+ * - Typography controls (scale + weights)
+ * - Color controls with paired text + <input type="color">
+ * - Export merged JSON / Reset overrides
+ *
+ * Requirements (already in your project from previous steps):
+ *  - hooks/useIsDev
+ *  - lib/theme/loader: { resolveThemeByName, getSystemMode }
+ *  - lib/theme/adapter: { applyCSSVariables }
+ */
+
+import React, { useEffect, useMemo, useState } from "react";
 import useIsDev from "@/hooks/useIsDev";
-import { getSystemMode, resolveThemeByName } from "@/lib/theme/loader";
+import { resolveThemeByName, getSystemMode } from "@/lib/theme/loader";
 import { applyCSSVariables } from "@/lib/theme/adapter";
-import {
-  loadOverrides,
-  saveOverrides,
-  clearOverrides,
-  applyOverrides,
-  downloadJson,
-  ThemeOverrides,
-} from "@/lib/theme/overrides";
+
+/* ---------------- helpers ---------------- */
+
+type Mode = "light" | "dark" | "system";
+type ThemeName =
+  | "apple"
+  | "fluent"
+  | "material"
+  | "carbon"
+  | "atlassian"
+  | "spectrum"
+  | "polaris"
+  | "mailchimp"
+  | "uberBase"
+  | "audi";
+
+const THEMES: ThemeName[] = [
+  "apple",
+  "fluent",
+  "material",
+  "carbon",
+  "atlassian",
+  "spectrum",
+  "polaris",
+  "mailchimp",
+  "uberBase",
+  "audi",
+];
+
+const CONTAINERS = ["page", "header", "footer", "hero", "section"] as const;
+type ContainerScope = (typeof CONTAINERS)[number];
+
+type ThemeOverrides = Partial<{
+  // typography
+  scaleFactor: number;
+  weightRegular: number;
+  weightMedium: number;
+  weightBold: number;
+
+  // colors
+  bg: string;
+  surface: string;
+  text: string;
+  textMuted: string;
+  primary: string;
+  primaryContrast: string;
+  border: string;
+  link: string;
+}>;
+
+const canUseLS = () =>
+  typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+
+const getLS = (k: string, fb = "") => {
+  if (!canUseLS()) return fb;
+  try {
+    const v = window.localStorage.getItem(k);
+    return v ?? fb;
+  } catch {
+    return fb;
+  }
+};
+const setLS = (k: string, v: string) => {
+  if (!canUseLS()) return;
+  try {
+    window.localStorage.setItem(k, v);
+  } catch {}
+};
+const delLS = (k: string) => {
+  if (!canUseLS()) return;
+  try {
+    window.localStorage.removeItem(k);
+  } catch {}
+};
+
+const downloadJson = (filename: string, data: any) => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+// merge base ← overrides (only known keys)
+function mergeOverrides(base: any, ov: ThemeOverrides) {
+  const out = { ...base };
+  const keys: (keyof ThemeOverrides)[] = [
+    "scaleFactor",
+    "weightRegular",
+    "weightMedium",
+    "weightBold",
+    "bg",
+    "surface",
+    "text",
+    "textMuted",
+    "primary",
+    "primaryContrast",
+    "border",
+    "link",
+  ];
+  for (const k of keys) {
+    const v = ov[k];
+    if (v !== undefined && v !== null && v !== "") {
+      // typography weights & scale are not CSS vars by default but
+      // your adapter can read them; also push vars for colors:
+      (out as any)[k] = v;
+    }
+  }
+  return out;
+}
+
+/* ---------------- styles ---------------- */
 
 const panelStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,
   right: 0,
   width: 360,
-  maxWidth: "90vw",
+  maxWidth: "92vw",
   height: "100vh",
-  background: "rgba(127, 228, 153, 1)",
+  background: "#54d28b", // vivid dev-only green
   color: "#111",
   borderLeft: "1px solid #e5e5ea",
   boxShadow: "0 0 24px rgba(0,0,0,.18)",
@@ -39,84 +164,206 @@ const Fab: React.FC<{ onClick: () => void }> = ({ onClick }) => (
       position: "fixed",
       right: 16,
       bottom: 16,
-      zIndex: 999999, // was 2100
+      zIndex: 2100,
       width: 56,
       height: 56,
       borderRadius: 28,
-      border: "2px solid #ff3b30",
-      background: "rgba(38, 30, 68, 1)",
+      border: "1px solid #d0d0d4",
+      background: "#fff",
       boxShadow: "0 8px 24px rgba(0,0,0,.25)",
       cursor: "pointer",
       fontWeight: 700,
     }}
+    aria-label="Open DevTools"
     title="Theme DevTools"
   >
     ⚙️
   </button>
 );
 
-type Mode = "light" | "dark" | "system";
-const Themes = [
-  "apple",
-  "fluent",
-  "material",
-  "carbon",
-  "atlassian",
-  "spectrum",
-  "polaris",
-  "mailchimp",
-  "uberBase",
-  "audi",
-] as const;
+/* ---------- small inputs ---------- */
 
-// safe localStorage helpers
-const canUseBrowserStorage = () =>
-  typeof window !== "undefined" && "localStorage" in window;
+const Row: React.FC<{
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}> = ({ children, style }) => (
+  <div style={{ display: "flex", gap: 8, alignItems: "center", ...style }}>
+    {children}
+  </div>
+);
 
-function getLS(key: string, fallback: string) {
-  if (!canUseBrowserStorage()) return fallback;
-  try {
-    const v = window.localStorage.getItem(key);
-    return v ?? fallback;
-  } catch {
-    return fallback;
-  }
+const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <label style={{ fontSize: 12, fontWeight: 600 }}>{children}</label>
+);
+
+function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      {...props}
+      style={{
+        width: "100%",
+        padding: 6,
+        borderRadius: 6,
+        border: "1px solid #d0d0d4",
+        background: "#fff",
+      }}
+    />
+  );
 }
 
-function setLS(key: string, value: string) {
-  if (!canUseBrowserStorage()) return;
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {}
+function Select(
+  props: React.DetailedHTMLProps<
+    React.SelectHTMLAttributes<HTMLSelectElement>,
+    HTMLSelectElement
+  >
+) {
+  return (
+    <select
+      {...props}
+      style={{
+        width: "100%",
+        padding: 6,
+        borderRadius: 6,
+        border: "1px solid #d0d0d4",
+        background: "#fff",
+      }}
+    />
+  );
 }
+
+const SectionTitle: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
+  <h4
+    style={{
+      margin: "16px 0 8px",
+      borderBottom: "1px solid #cdeacf",
+      paddingBottom: 4,
+    }}
+  >
+    {children}
+  </h4>
+);
+
+/* ---------- color row with picker ---------- */
+
+function ColorRow({
+  label,
+  value,
+  onChange,
+  title,
+}: {
+  label: string;
+  value?: string;
+  onChange: (v: string) => void;
+  title?: string;
+}) {
+  // if value isn't a hex, still allow editing in text box; picker needs hex
+  const hexOk = (v: string) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v);
+  const safe = value && hexOk(value) ? value : "#000000";
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "110px 1fr 38px",
+        gap: 8,
+        alignItems: "center",
+        marginBottom: 8,
+      }}
+    >
+      <Label>{label}</Label>
+      <TextInput
+        placeholder="#RRGGBB or rgba()"
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        title={title}
+      />
+      <input
+        type="color"
+        value={safe}
+        onChange={(e) => onChange(e.target.value)}
+        title={title}
+        style={{
+          width: 38,
+          height: 32,
+          padding: 0,
+          border: "1px solid #d0d0d4",
+          background: "#fff",
+          borderRadius: 6,
+        }}
+      />
+    </div>
+  );
+}
+
+/* ---------------- main ---------------- */
 
 export default function DevToolsPanel({
   themeUrl = "/themes.json",
 }: {
   themeUrl?: string;
 }) {
+  // dev gating
   const isDev = useIsDev();
 
-  // 1) Initialize with safe defaults (no localStorage in render)
+  // open/close
   const [open, setOpen] = useState(false);
-  const [themeName, setThemeName] = useState<string>("apple");
-  const [mode, setMode] = useState<Mode>("light");
-  const [ov, setOv] = useState<ThemeOverrides>({});
-  const [scale, setScale] = useState<number>(1);
 
-  // 2) Hydrate from localStorage on client
+  // theme selection
+  const [themeName, setThemeName] = useState<ThemeName>(
+    (getLS(
+      "theme:name",
+      process.env.NEXT_PUBLIC_THEME_NAME || "apple"
+    ) as ThemeName) || "apple"
+  );
+  const [mode, setMode] = useState<Mode>(
+    (getLS(
+      "theme:mode",
+      (process.env.NEXT_PUBLIC_THEME_MODE as Mode) || "light"
+    ) as Mode) || "light"
+  );
+
+  // scope (route + container + element)
+  const initialRoute =
+    typeof window !== "undefined" ? window.location.pathname : ("/" as string);
+  const [route, setRoute] = useState<string>(initialRoute);
+  const [scopeContainer, setScopeContainer] = useState<ContainerScope>("page");
+  const [scopeElement, setScopeElement] = useState<string>("default");
+
+  // overrides (scoped)
+  const scopeKey = useMemo(
+    () => `theme:overrides:${route}:${scopeContainer}:${scopeElement}`,
+    [route, scopeContainer, scopeElement]
+  );
+  const [ov, setOv] = useState<ThemeOverrides>({});
+
+  // local typography UI state
+  const [scale, setScale] = useState<number>(1);
+  const [wReg, setWReg] = useState<number | undefined>(undefined);
+  const [wMed, setWMed] = useState<number | undefined>(undefined);
+  const [wBold, setWBold] = useState<number | undefined>(undefined);
+
+  // load current scope overrides
   useEffect(() => {
     if (!isDev) return;
-    const initialTheme = getLS("theme:name", "apple");
-    const initialMode = (getLS("theme:mode", "light") as Mode) || "light";
-    const initialOverrides = loadOverrides();
-    setThemeName(initialTheme);
-    setMode(initialMode);
-    setOv(initialOverrides);
-    setScale(initialOverrides.scaleFactor ?? 1);
-  }, [isDev]);
+    try {
+      const raw = getLS(scopeKey, "");
+      const parsed = raw ? (JSON.parse(raw) as ThemeOverrides) : {};
+      setOv(parsed);
+      setScale(parsed.scaleFactor ?? 1);
+      setWReg(parsed.weightRegular);
+      setWMed(parsed.weightMedium);
+      setWBold(parsed.weightBold);
+    } catch {
+      setOv({});
+      setScale(1);
+      setWReg(undefined);
+      setWMed(undefined);
+      setWBold(undefined);
+    }
+  }, [isDev, scopeKey]);
 
-  // 3) Apply theme every time controls change
+  // apply on any change
   useEffect(() => {
     if (!isDev) return;
     (async () => {
@@ -125,28 +372,48 @@ export default function DevToolsPanel({
         fallbackUrl: themeUrl,
       });
       if (!base) return;
-      const merged = applyOverrides(base, ov);
+      const merged = mergeOverrides(base, {
+        ...ov,
+        scaleFactor: scale,
+        weightRegular: wReg,
+        weightMedium: wMed,
+        weightBold: wBold,
+      });
       applyCSSVariables(merged);
+      // notify any listeners (e.g., DevThemeBadge)
+      window.dispatchEvent(new CustomEvent("theme:applied"));
     })();
-  }, [isDev, themeName, mode, ov, themeUrl]);
+  }, [isDev, themeName, mode, ov, scale, wReg, wMed, wBold, themeUrl]);
 
   if (!isDev) return null;
 
-  const handleOverride = (k: keyof ThemeOverrides, v: string | number) => {
-    const next = { ...ov, [k]: v as any };
+  // helpers to persist current scope overrides
+  const saveCurrentScope = (next: ThemeOverrides) => {
     setOv(next);
-    saveOverrides(next);
+    setLS(scopeKey, JSON.stringify(next));
+  };
+
+  const handleOverride = (
+    k: keyof ThemeOverrides,
+    v: string | number | undefined
+  ) => {
+    const next = { ...ov, [k]: v as any };
+    saveCurrentScope(next);
   };
 
   const resetOverrides = async () => {
-    clearOverrides();
+    delLS(scopeKey);
+    setOv({});
+    setScale(1);
+    setWReg(undefined);
+    setWMed(undefined);
+    setWBold(undefined);
+
     const effective = mode === "system" ? getSystemMode() : mode;
     const base = await resolveThemeByName(themeName, effective, {
       fallbackUrl: themeUrl,
     });
     if (base) applyCSSVariables(base);
-    setOv({});
-    setScale(1);
   };
 
   const exportMerged = async () => {
@@ -155,7 +422,13 @@ export default function DevToolsPanel({
       fallbackUrl: themeUrl,
     });
     if (!base) return;
-    const merged = applyOverrides(base, ov);
+    const merged = mergeOverrides(base, {
+      ...ov,
+      scaleFactor: scale,
+      weightRegular: wReg,
+      weightMedium: wMed,
+      weightBold: wBold,
+    });
     downloadJson(`${themeName}-${effective}-merged.json`, merged);
   };
 
@@ -166,20 +439,21 @@ export default function DevToolsPanel({
         style={{ ...panelStyle, ...(open ? openStyle : {}) }}
         aria-hidden={!open}
       >
+        {/* header */}
         <div
           style={{
             padding: "14px 16px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            borderBottom: "1px solid #eee",
+            borderBottom: "1px solid #cdeacf",
           }}
         >
           <strong>Theme DevTools</strong>
           <button
             onClick={() => setOpen(false)}
             style={{
-              border: "1px solid #e0e0e0",
+              border: "1px solid #cdeacf",
               background: "#fff",
               padding: "6px 10px",
               borderRadius: 6,
@@ -190,55 +464,90 @@ export default function DevToolsPanel({
           </button>
         </div>
 
+        {/* body */}
         <div style={{ padding: 16, overflow: "auto" }}>
-          {/* Theme */}
-          <label>Theme</label>
-          <select
-            value={themeName}
-            onChange={(e) => {
-              const n = e.target.value;
-              setThemeName(n);
-              setLS("theme:name", n);
+          {/* Scope */}
+          <SectionTitle>Scope</SectionTitle>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: 8,
             }}
-            style={{ width: "100%", padding: 8 }}
           >
-            {Themes.map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
+            <TextInput
+              value={route}
+              onChange={(e) => setRoute(e.target.value || "/")}
+              placeholder="/ (route)"
+              title="Route (e.g., /, /products, /contact)"
+            />
+            <Select
+              value={scopeContainer}
+              onChange={(e) =>
+                setScopeContainer(e.target.value as ContainerScope)
+              }
+              title="Container"
+            >
+              {CONTAINERS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </Select>
+            <TextInput
+              value={scopeElement}
+              onChange={(e) => setScopeElement(e.target.value || "default")}
+              placeholder="element (optional)"
+              title="Element key within the container (optional)"
+            />
+          </div>
 
-          {/* Mode */}
-          <label style={{ marginTop: 12 }}>Mode</label>
-          <select
-            value={mode}
-            onChange={(e) => {
-              const m = e.target.value as Mode;
-              setMode(m);
-              setLS("theme:mode", m);
-            }}
-            style={{ width: "100%", padding: 8 }}
-          >
-            <option value="light">light</option>
-            <option value="dark">dark</option>
-            <option value="system">system</option>
-          </select>
+          {/* Theme */}
+          <SectionTitle>Theme</SectionTitle>
+          <Row>
+            <Label>Theme</Label>
+            <Select
+              value={themeName}
+              onChange={(e) => {
+                const n = e.target.value as ThemeName;
+                setThemeName(n);
+                setLS("theme:name", n);
+              }}
+            >
+              {THEMES.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </Select>
+          </Row>
+
+          <Row style={{ marginTop: 8 }}>
+            <Label>Mode</Label>
+            <Select
+              value={mode}
+              onChange={(e) => {
+                const m = e.target.value as Mode;
+                setMode(m);
+                setLS("theme:mode", m);
+              }}
+            >
+              <option value="light">light</option>
+              <option value="dark">dark</option>
+              <option value="system">system</option>
+            </Select>
+          </Row>
 
           {/* Typography */}
-          <h4 style={{ margin: "16px 0 8px" }}>Typography</h4>
-          <label>Scale factor: {scale.toFixed(2)}</label>
+          <SectionTitle>Typography</SectionTitle>
+          <Label>Scale factor: {scale.toFixed(2)}</Label>
           <input
             type="range"
             min={0.8}
             max={1.5}
             step={0.02}
             value={scale}
-            onChange={(e) => {
-              const v = parseFloat(e.target.value);
-              setScale(v);
-              handleOverride("scaleFactor", v);
-            }}
+            onChange={(e) => setScale(parseFloat(e.target.value))}
             style={{ width: "100%" }}
           />
           <div
@@ -250,54 +559,42 @@ export default function DevToolsPanel({
             }}
           >
             <div>
-              <label>Regular</label>
-              <input
+              <Label>Regular</Label>
+              <TextInput
                 type="number"
                 placeholder="400"
-                value={ov.weightRegular ?? ""}
+                value={wReg ?? ""}
                 onChange={(e) =>
-                  handleOverride(
-                    "weightRegular",
-                    e.target.value ? +e.target.value : (undefined as any)
-                  )
+                  setWReg(e.target.value ? +e.target.value : undefined)
                 }
-                style={{ width: "100%", padding: 6 }}
               />
             </div>
             <div>
-              <label>Medium</label>
-              <input
+              <Label>Medium</Label>
+              <TextInput
                 type="number"
                 placeholder="500"
-                value={ov.weightMedium ?? ""}
+                value={wMed ?? ""}
                 onChange={(e) =>
-                  handleOverride(
-                    "weightMedium",
-                    e.target.value ? +e.target.value : (undefined as any)
-                  )
+                  setWMed(e.target.value ? +e.target.value : undefined)
                 }
-                style={{ width: "100%", padding: 6 }}
               />
             </div>
             <div>
-              <label>Bold</label>
-              <input
+              <Label>Bold</Label>
+              <TextInput
                 type="number"
                 placeholder="700"
-                value={ov.weightBold ?? ""}
+                value={wBold ?? ""}
                 onChange={(e) =>
-                  handleOverride(
-                    "weightBold",
-                    e.target.value ? +e.target.value : (undefined as any)
-                  )
+                  setWBold(e.target.value ? +e.target.value : undefined)
                 }
-                style={{ width: "100%", padding: 6 }}
               />
             </div>
           </div>
 
           {/* Colors */}
-          <h4 style={{ margin: "16px 0 8px" }}>Colors</h4>
+          <SectionTitle>Colors</SectionTitle>
           {[
             ["bg", "Background"],
             ["surface", "Surface"],
@@ -308,40 +605,39 @@ export default function DevToolsPanel({
             ["border", "Border"],
             ["link", "Link"],
           ].map(([k, label]) => (
-            <div
+            <ColorRow
               key={k}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "110px 1fr",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 8,
-              }}
-            >
-              <label>{label}</label>
-              <input
-                type="text"
-                placeholder="#RRGGBB or rgba()"
-                value={(ov as any)[k] ?? ""}
-                onChange={(e) =>
-                  handleOverride(
-                    k as keyof ThemeOverrides,
-                    e.target.value || (undefined as any)
-                  )
-                }
-                style={{ width: "100%", padding: 6 }}
-              />
-            </div>
+              label={label}
+              value={(ov as any)[k]}
+              onChange={(val) =>
+                handleOverride(
+                  k as keyof ThemeOverrides,
+                  val || (undefined as any)
+                )
+              }
+              title={k}
+            />
           ))}
 
-          {/* Actions */}
+          {/* actions */}
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
             <button
-              onClick={exportMerged}
+              onClick={async () => {
+                // persist latest local UI to the override object before export
+                const next = {
+                  ...ov,
+                  scaleFactor: scale,
+                  weightRegular: wReg,
+                  weightMedium: wMed,
+                  weightBold: wBold,
+                } as ThemeOverrides;
+                saveCurrentScope(next);
+                await exportMerged();
+              }}
               style={{
                 padding: "8px 12px",
                 borderRadius: 8,
-                border: "1px solid #e0e0e0",
+                border: "1px solid #cdeacf",
                 background: "#fff",
                 cursor: "pointer",
               }}
@@ -353,7 +649,7 @@ export default function DevToolsPanel({
               style={{
                 padding: "8px 12px",
                 borderRadius: 8,
-                border: "1px solid #e0e0e0",
+                border: "1px solid #cdeacf",
                 background: "#fff",
                 cursor: "pointer",
               }}
@@ -362,60 +658,12 @@ export default function DevToolsPanel({
             </button>
           </div>
 
-          <p style={{ marginTop: 12, fontSize: 12, color: "#666" }}>
+          <p style={{ marginTop: 12, fontSize: 12, color: "#225e37" }}>
             Dev-only. Set <code>NEXT_PUBLIC_ENABLE_DEVTOOLS=false</code> to
             disable in production.
           </p>
         </div>
       </aside>
     </>
-  );
-}
-// inside DevToolsPanel color render loop
-function ColorRow({
-  keyName,
-  label,
-  value,
-  onChange,
-}: {
-  keyName: string;
-  label: string;
-  value?: string;
-  onChange: (v: string) => void;
-}) {
-  const safe =
-    value && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value) ? value : "#000000";
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "110px 1fr 40px",
-        gap: 8,
-        alignItems: "center",
-        marginBottom: 8,
-      }}
-    >
-      <label>{label}</label>
-      <input
-        type="text"
-        placeholder="#RRGGBB or rgba()"
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 6 }}
-      />
-      <input
-        type="color"
-        value={safe}
-        onChange={(e) => onChange(e.target.value)}
-        title={keyName}
-        style={{
-          width: 40,
-          height: 32,
-          padding: 0,
-          border: "1px solid #e0e0e0",
-          background: "#fff",
-        }}
-      />
-    </div>
   );
 }
