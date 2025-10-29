@@ -1,16 +1,22 @@
 // app/layout.tsx
-import "@carbon/styles/css/styles.css"; // Carbon base/styles
-import "./globals.scss"; // <-- your overrides LAST
+import AppContainer from "@/components/containers/AppContainer";
 
-import type { ReactNode } from "react";
-import { Theme } from "@carbon/react";
-
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
-        {/* g10 = light; g100 = dark */}
-        <Theme theme="g10">{children}</Theme>
+        <AppContainer
+          themeUrl="/themes.json" // or your CMS endpoint
+          themeName="apple" // "apple" | "fluent" | "material"
+          themeMode="system" // "light" | "dark" | "system"
+          headerHeight={56}
+        >
+          {children}
+        </AppContainer>
       </body>
     </html>
   );

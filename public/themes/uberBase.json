@@ -1,0 +1,30 @@
+{
+  "name": "uberBase",
+  "colors": {
+    "bg": "#FFFFFF",
+    "surface": "#F7F7F7",
+    "text": "#161616",
+    "textMuted": "#6F6F6F",
+    "primary": "#276EF1",
+    "primaryContrast": "#FFFFFF",
+    "border": "#E5E5E5",
+    "link": "#276EF1",
+    "overlay": "rgba(0,0,0,0.03)"
+  },
+  "font": {
+    "family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    "weightRegular": 400,
+    "weightMedium": 500,
+    "weightBold": 700,
+    "sizeBody": "clamp(14px, 1.04vw, 16px)",
+    "sizeH1": "clamp(30px, 3.0vw, 42px)",
+    "sizeH2": "clamp(22px, 2.2vw, 28px)",
+    "sizeH3": "clamp(18px, 1.6vw, 22px)",
+    "lineHeight": 1.48
+  },
+  "radius": "10px",
+  "spacing": 8,
+  "shadowSm": "0 1px 2px rgba(0,0,0,.06)",
+  "shadowMd": "0 4px 12px rgba(0,0,0,.10)",
+  "shadowLg": "0 10px 24px rgba(0,0,0,.14)"
+}

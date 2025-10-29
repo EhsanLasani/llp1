@@ -1,20 +1,22 @@
 "use client";
 
-import AppHeader from "@/components/Header";
-import AppFooter from "@/components/Footer";
+import PageContainer from "@/components/containers/PageContainer";
+import BodyContainer from "@/components/containers/BodyContainer";
+import HeroContainer from "@/components/containers/HeroContainer";
+import SectionContainer from "@/components/containers/SectionContainer";
 
 export default function Home() {
   return (
-    <>
-      <AppHeader />
-
-      <main className="main-wrap">
-        <h1>Welcome to Apple Books</h1>
-        <h3>Testing areas under headers</h3>
-        <p>Lasani Fluid Power LLP website preparation</p>
-      </main>
-
-      <AppFooter />
-    </>
+    <PageContainer>
+      <BodyContainer>
+        <HeroContainer
+          title="Welcome to Apple Books"
+          subtitle="Testing areas under headers"
+        />
+        <SectionContainer heading="Latest">
+          <p>Lasani Fluid Power LLP website preparation</p>
+        </SectionContainer>
+      </BodyContainer>
+    </PageContainer>
   );
 }

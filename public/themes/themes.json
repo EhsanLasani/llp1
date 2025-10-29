@@ -1,0 +1,324 @@
+{
+  "themes": [
+    {
+      "name": "apple",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F5F5F7",
+        "text": "#1D1D1F",
+        "textMuted": "#6E6E73",
+        "primary": "#0071E3",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E5E5EA",
+        "link": "#0071E3",
+        "overlay": "rgba(0,0,0,0.04)"
+      },
+      "font": {
+        "family": "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 500,
+        "weightBold": 600,
+        "sizeBody": "clamp(14px, 1.05vw, 16px)",
+        "sizeH1": "clamp(30px, 3.0vw, 42px)",
+        "sizeH2": "clamp(24px, 2.3vw, 30px)",
+        "sizeH3": "clamp(18px, 1.7vw, 22px)",
+        "lineHeight": 1.42
+      },
+      "radius": "12px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.06)",
+      "shadowMd": "0 4px 10px rgba(0,0,0,.10)",
+      "shadowLg": "0 10px 30px rgba(0,0,0,.14)"
+    },
+    {
+      "name": "fluent",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#FAFAFA",
+        "text": "#1B1B1B",
+        "textMuted": "#70757A",
+        "primary": "#115EA3",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E0E0E0",
+        "link": "#115EA3",
+        "overlay": "rgba(255,255,255,0.6)"
+      },
+      "font": {
+        "family": "'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 600,
+        "weightBold": 700,
+        "sizeBody": "clamp(14px, 1.05vw, 16px)",
+        "sizeH1": "clamp(30px, 3vw, 40px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.45
+      },
+      "radius": "8px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.06)",
+      "shadowMd": "0 4px 12px rgba(0,0,0,.10)",
+      "shadowLg": "0 8px 24px rgba(0,0,0,.14)"
+    },
+    {
+      "name": "material",
+      "font": {
+        "family": "Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 500,
+        "weightBold": 700,
+        "sizeBody": "clamp(14px, 1.05vw, 16px)",
+        "sizeH1": "clamp(32px, 3.2vw, 44px)",
+        "sizeH2": "clamp(24px, 2.4vw, 32px)",
+        "sizeH3": "clamp(18px, 1.8vw, 24px)",
+        "lineHeight": 1.5
+      },
+      "radius": "12px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.08)",
+      "shadowMd": "0 3px 8px rgba(0,0,0,.12)",
+      "shadowLg": "0 10px 24px rgba(0,0,0,.18)",
+      "modes": {
+        "light": {
+          "colors": {
+            "bg": "#FFFFFF",
+            "surface": "#F7F7F7",
+            "text": "#1F1F1F",
+            "textMuted": "#666A6D",
+            "primary": "#2962FF",
+            "primaryContrast": "#FFFFFF",
+            "border": "#E5E7EB",
+            "link": "#2962FF",
+            "overlay": "rgba(0,0,0,0.04)"
+          }
+        },
+        "dark": {
+          "colors": {
+            "bg": "#121212",
+            "surface": "#1E1E1E",
+            "text": "#ECECEC",
+            "textMuted": "#B5B5B5",
+            "primary": "#82B1FF",
+            "primaryContrast": "#0D0D0D",
+            "border": "#2A2A2A",
+            "link": "#82B1FF",
+            "overlay": "rgba(255,255,255,0.06)"
+          },
+          "shadowSm": "0 1px 2px rgba(0,0,0,.5)",
+          "shadowMd": "0 6px 12px rgba(0,0,0,.55)",
+          "shadowLg": "0 12px 28px rgba(0,0,0,.6)"
+        }
+      }
+    },
+    {
+      "name": "carbon",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F4F4F4",
+        "text": "#161616",
+        "textMuted": "#6F6F6F",
+        "primary": "#0F62FE",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E0E0E0",
+        "link": "#0F62FE",
+        "overlay": "rgba(0,0,0,0.03)"
+      },
+      "font": {
+        "family": "'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 500,
+        "weightBold": 600,
+        "sizeBody": "clamp(14px, 1.05vw, 16px)",
+        "sizeH1": "clamp(28px, 3vw, 38px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.46
+      },
+      "radius": "8px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.05)",
+      "shadowMd": "0 3px 10px rgba(0,0,0,.08)",
+      "shadowLg": "0 8px 24px rgba(0,0,0,.12)"
+    },
+    {
+      "name": "atlassian",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F4F5F7",
+        "text": "#172B4D",
+        "textMuted": "#6B778C",
+        "primary": "#0052CC",
+        "primaryContrast": "#FFFFFF",
+        "border": "#DFE1E6",
+        "link": "#0052CC",
+        "overlay": "rgba(9,30,66,0.03)"
+      },
+      "font": {
+        "family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 500,
+        "weightBold": 700,
+        "sizeBody": "clamp(14px, 1.02vw, 16px)",
+        "sizeH1": "clamp(28px, 2.8vw, 38px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.5
+      },
+      "radius": "8px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(9,30,66,.10)",
+      "shadowMd": "0 4px 12px rgba(9,30,66,.12)",
+      "shadowLg": "0 8px 24px rgba(9,30,66,.16)"
+    },
+    {
+      "name": "spectrum",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F6F6F6",
+        "text": "#2C2C2C",
+        "textMuted": "#7A7A7A",
+        "primary": "#1473E6",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E3E3E3",
+        "link": "#1473E6",
+        "overlay": "rgba(0,0,0,0.04)"
+      },
+      "font": {
+        "family": "'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 600,
+        "weightBold": 700,
+        "sizeBody": "clamp(14px, 1.05vw, 16px)",
+        "sizeH1": "clamp(30px, 3vw, 40px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.5
+      },
+      "radius": "10px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.06)",
+      "shadowMd": "0 4px 12px rgba(0,0,0,.10)",
+      "shadowLg": "0 10px 28px rgba(0,0,0,.14)"
+    },
+    {
+      "name": "polaris",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F6F6F7",
+        "text": "#202223",
+        "textMuted": "#6D7175",
+        "primary": "#008060",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E1E3E5",
+        "link": "#008060",
+        "overlay": "rgba(0,0,0,0.03)"
+      },
+      "font": {
+        "family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 500,
+        "weightBold": 600,
+        "sizeBody": "clamp(14px, 1.02vw, 16px)",
+        "sizeH1": "clamp(28px, 2.8vw, 38px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.5
+      },
+      "radius": "12px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.06)",
+      "shadowMd": "0 3px 10px rgba(0,0,0,.10)",
+      "shadowLg": "0 8px 20px rgba(0,0,0,.14)"
+    },
+    {
+      "name": "mailchimp",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#FFF9E5",
+        "text": "#241C15",
+        "textMuted": "#6B5E56",
+        "primary": "#007C89",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E6DCCF",
+        "link": "#007C89",
+        "overlay": "rgba(0,0,0,0.03)"
+      },
+      "font": {
+        "family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 500,
+        "weightBold": 700,
+        "sizeBody": "clamp(14px, 1.05vw, 16px)",
+        "sizeH1": "clamp(30px, 3.0vw, 42px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.5
+      },
+      "radius": "10px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.05)",
+      "shadowMd": "0 4px 10px rgba(0,0,0,.10)",
+      "shadowLg": "0 10px 26px rgba(0,0,0,.14)"
+    },
+    {
+      "name": "uberBase",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F7F7F7",
+        "text": "#161616",
+        "textMuted": "#6F6F6F",
+        "primary": "#276EF1",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E5E5E5",
+        "link": "#276EF1",
+        "overlay": "rgba(0,0,0,0.03)"
+      },
+      "font": {
+        "family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 500,
+        "weightBold": 700,
+        "sizeBody": "clamp(14px, 1.04vw, 16px)",
+        "sizeH1": "clamp(30px, 3.0vw, 42px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.48
+      },
+      "radius": "10px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.06)",
+      "shadowMd": "0 4px 12px rgba(0,0,0,.10)",
+      "shadowLg": "0 10px 24px rgba(0,0,0,.14)"
+    },
+    {
+      "name": "audi",
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F5F5F5",
+        "text": "#0A0A0A",
+        "textMuted": "#6B6B6B",
+        "primary": "#BB0A30",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E2E2E2",
+        "link": "#BB0A30",
+        "overlay": "rgba(0,0,0,0.03)"
+      },
+      "font": {
+        "family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        "weightRegular": 400,
+        "weightMedium": 600,
+        "weightBold": 700,
+        "sizeBody": "clamp(14px, 1.04vw, 16px)",
+        "sizeH1": "clamp(30px, 3.0vw, 42px)",
+        "sizeH2": "clamp(22px, 2.2vw, 28px)",
+        "sizeH3": "clamp(18px, 1.6vw, 22px)",
+        "lineHeight": 1.44
+      },
+      "radius": "10px",
+      "spacing": 8,
+      "shadowSm": "0 1px 2px rgba(0,0,0,.06)",
+      "shadowMd": "0 4px 12px rgba(0,0,0,.10)",
+      "shadowLg": "0 12px 28px rgba(0,0,0,.16)"
+    }
+  ]
+}

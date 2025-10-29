@@ -1,0 +1,30 @@
+{
+  "name": "mailchimp",
+  "colors": {
+    "bg": "#FFFFFF",
+    "surface": "#FFF9E5",
+    "text": "#241C15",
+    "textMuted": "#6B5E56",
+    "primary": "#007C89",
+    "primaryContrast": "#FFFFFF",
+    "border": "#E6DCCF",
+    "link": "#007C89",
+    "overlay": "rgba(0,0,0,0.03)"
+  },
+  "font": {
+    "family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    "weightRegular": 400,
+    "weightMedium": 500,
+    "weightBold": 700,
+    "sizeBody": "clamp(14px, 1.05vw, 16px)",
+    "sizeH1": "clamp(30px, 3.0vw, 42px)",
+    "sizeH2": "clamp(22px, 2.2vw, 28px)",
+    "sizeH3": "clamp(18px, 1.6vw, 22px)",
+    "lineHeight": 1.5
+  },
+  "radius": "10px",
+  "spacing": 8,
+  "shadowSm": "0 1px 2px rgba(0,0,0,.05)",
+  "shadowMd": "0 4px 10px rgba(0,0,0,.10)",
+  "shadowLg": "0 10px 26px rgba(0,0,0,.14)"
+}

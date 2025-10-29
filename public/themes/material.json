@@ -1,0 +1,50 @@
+{
+  "name": "material",
+  "font": {
+    "family": "Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+    "weightRegular": 400,
+    "weightMedium": 500,
+    "weightBold": 700,
+    "sizeBody": "clamp(14px, 1.05vw, 16px)",
+    "sizeH1": "clamp(32px, 3.2vw, 44px)",
+    "sizeH2": "clamp(24px, 2.4vw, 32px)",
+    "sizeH3": "clamp(18px, 1.8vw, 24px)",
+    "lineHeight": 1.5
+  },
+  "radius": "12px",
+  "spacing": 8,
+  "shadowSm": "0 1px 2px rgba(0,0,0,.08)",
+  "shadowMd": "0 3px 8px rgba(0,0,0,.12)",
+  "shadowLg": "0 10px 24px rgba(0,0,0,.18)",
+  "modes": {
+    "light": {
+      "colors": {
+        "bg": "#FFFFFF",
+        "surface": "#F7F7F7",
+        "text": "#1F1F1F",
+        "textMuted": "#666A6D",
+        "primary": "#2962FF",
+        "primaryContrast": "#FFFFFF",
+        "border": "#E5E7EB",
+        "link": "#2962FF",
+        "overlay": "rgba(0,0,0,0.04)"
+      }
+    },
+    "dark": {
+      "colors": {
+        "bg": "#121212",
+        "surface": "#1E1E1E",
+        "text": "#ECECEC",
+        "textMuted": "#B5B5B5",
+        "primary": "#82B1FF",
+        "primaryContrast": "#0D0D0D",
+        "border": "#2A2A2A",
+        "link": "#82B1FF",
+        "overlay": "rgba(255,255,255,0.06)"
+      },
+      "shadowSm": "0 1px 2px rgba(0,0,0,.5)",
+      "shadowMd": "0 6px 12px rgba(0,0,0,.55)",
+      "shadowLg": "0 12px 28px rgba(0,0,0,.6)"
+    }
+  }
+}

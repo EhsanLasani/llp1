@@ -1,15 +1,17 @@
 /* =========================================================
-   Global layout: fixed Header (top) + fixed Footer (bottom)
-   Content fills remaining space; works for all pages
+   LASANI — Global Styles
+   Fixed Carbon Header (top) + Auto-height Footer (bottom)
+   Content fills remaining height between them
+   Theme driven via CSS variables published by AppContainer
    ========================================================= */
 
-/* ---- Sizes (tune once) ---- */
+/* ---- Layout sizes (safe defaults; AppContainer can override) ---- */
 :root {
-  --app-header-height: 56px; /* set to your real header height (48–64 typical) */
-  --app-footer-height: 80px; /* set to your real footer height */
+  --app-header-height: 56px; /* tune to your header/logo */
+  --app-footer-height: 80px; /* fallback; will be updated dynamically */
 }
 
-/* ---- Base document ---- */
+/* ---- Base document / Theme consumption ---- */
 html,
 body {
   height: 100%;
@@ -17,17 +19,84 @@ body {
 }
 
 body {
-  /* Reserve space for fixed header & footer so content never hides behind them */
+  /* reserve space so content never hides under fixed header/footer */
   padding-top: var(--app-header-height);
   padding-bottom: var(--app-footer-height);
 
-  background: #fff;
-  color: #1d1d1f;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+  /* theme tokens (provided by AppContainer) */
+  background: var(--app-bg, #ffffff);
+  color: var(--app-text, #1d1d1f);
+  font-family: var(
+    --app-font-family,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif
+  );
+  font-size: var(--app-fs-body, 16px);
+  line-height: var(--app-line, 1.45);
+  font-weight: var(--app-fw-regular, 400);
 }
 
-/* ---- Carbon Header (fixed at top) ---- */
+/* Headings (fluid, theme-driven) */
+h1,
+.h1 {
+  font-size: var(--app-fs-h1, 2.25rem);
+  font-weight: var(--app-fw-bold, 700);
+  line-height: calc(var(--app-line, 1.45) * 1.1);
+  margin: 0 0 calc(var(--app-space, 8px) * 1.5);
+}
+h2,
+.h2 {
+  font-size: var(--app-fs-h2, 1.5rem);
+  font-weight: var(--app-fw-medium, 500);
+  margin: 0 0 calc(var(--app-space, 8px) * 1.25);
+}
+h3,
+.h3 {
+  font-size: var(--app-fs-h3, 1.25rem);
+  font-weight: var(--app-fw-medium, 500);
+  margin: 0 0 var(--app-space, 8px);
+}
+
+a {
+  color: var(--app-link, var(--app-primary, #0f62fe));
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Surfaces & buttons (examples using tokens) */
+.surface {
+  background: var(--app-surface, #f5f5f7);
+  border: 1px solid var(--app-border, #e5e5ea);
+  border-radius: var(--app-radius, 12px);
+  box-shadow: var(--app-shadow-sm, none);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--app-radius, 12px);
+  border: 1px solid var(--app-border, #e5e5ea);
+  background: var(--app-surface, #f5f5f7);
+  color: var(--app-text, #1d1d1f);
+}
+.btn-primary {
+  background: var(--app-primary, #0f62fe);
+  color: var(--app-primary-contrast, #ffffff);
+  border-color: transparent;
+}
+
+/* =========================================================
+   Carbon Header — fixed at top (Apple-like polish)
+   ========================================================= */
+
 .cds--header,
 .custom-header {
   position: fixed !important;
@@ -35,49 +104,47 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
+
+  /* theme-aware background & subtle shadow */
+  background: var(--app-bg, #ffffff) !important;
+  color: var(--app-text, #1d1d1f) !important;
   border-bottom: none !important;
-  background: #fff !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* Brand (logo + text) spacing */
-.cds--header__name {
+/* Logo + brand spacing */
+.cds--header .cds--header__name {
   display: flex !important;
   align-items: center !important;
   gap: 6px !important; /* logo ↔ text */
   margin-right: 12px !important; /* brand ↔ first nav item */
 }
-
-/* Logo sizing/align */
 .cds--header__name img {
-  height: 28px; /* ~24–32 keeps it tidy */
+  height: 28px; /* 24–32 recommended */
   display: block;
   object-fit: contain;
-  margin-top: 0;
 }
 
-/* Navigation spacing & separators */
-.cds--header__nav {
+/* Navigation tightening + remove separators */
+.cds--header .cds--header__nav {
   margin-inline-start: 0 !important;
   padding-inline-start: 0 !important;
 }
-
-.cds--header__menu-item {
+.cds--header .cds--header__menu-item {
   padding-inline: 10px !important;
   background: transparent !important;
 }
-
-.cds--header__menu-bar::before,
-.cds--header__menu-bar::after {
+.cds--header .cds--header__menu-bar::before,
+.cds--header .cds--header__menu-bar::after {
   display: none !important;
 }
 
-/* Optional hard hook if you add className="logo-tight" */
+/* Optional hard hook if used in HeaderContainer */
 .logo-tight {
   margin-right: 8px !important;
 }
 
-/* Utility: screen-reader-only text */
+/* Screen-reader utility */
 .sr-only {
   position: absolute !important;
   width: 1px !important;
@@ -89,41 +156,39 @@ body {
   border: 0 !important;
 }
 
-/* ---- Main content fills space between header and footer ---- */
+/* =========================================================
+   Main area — fills space between header and footer
+   ========================================================= */
+
 main,
 .main-wrap {
   min-height: calc(100vh - var(--app-header-height) - var(--app-footer-height));
   padding: 24px;
-  background: #f9f9f9;
+  background: var(--app-surface, #f5f5f7);
 }
-
 .main-wrap h1 {
   margin-top: 8px;
-  line-height: 1.2;
 }
 
-/* Optional visible brand text style */
-.brand-text {
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1;
-}
+/* =========================================================
+   Footer — fixed at bottom, auto-height (measured at runtime)
+   ========================================================= */
 
-/* Footer (fixed bottom, auto-height) */
 .custom-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #f5f5f7;
-  color: #6e6e73;
-  border-top: 1px solid #e5e5e5;
-  /* IMPORTANT: do NOT make this a flex container — it shrinks columns */
-  /* no display:flex here */
   z-index: 900;
+
+  background: #f5f5f7; /* can also use var(--app-surface) */
+  color: #6e6e73; /* or var(--app-text-muted) */
+  border-top: 1px solid #e5e5e5; /* or var(--app-border) */
+
+  /* IMPORTANT: do not make this a flex container; it shrinks inner content */
 }
 
-/* Inner wrapper: full width + max content width */
+/* Inner wrapper: full width with max content width */
 .footer-inner {
   width: 100%;
   max-width: 1200px;
@@ -131,7 +196,7 @@ main,
   padding: 16px 24px;
 }
 
-/* Row 1: three responsive columns laid out by CSS grid */
+/* Row 1 — 3 responsive columns via CSS grid */
 .footer-top {
   display: grid;
   grid-template-columns: repeat(3, minmax(220px, 1fr));
@@ -139,22 +204,34 @@ main,
   align-items: start;
 }
 
-/* Titles/text */
+/* Row 2 — divider + centered copy */
+.footer-bottom {
+  margin-top: 12px;
+}
+.footer-divider {
+  border: 0;
+  border-top: 1px solid #e0e0e0;
+  margin: 10px 0;
+}
+.footer-copy {
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+/* Footer text / links */
 .footer-title {
   margin: 0 0 8px;
   font-size: 1rem;
-  color: #1d1d1f;
+  color: var(--app-text, #1d1d1f);
 }
 .footer-subtitle {
   margin: 0 0 6px;
   font-size: 0.95rem;
-  color: #1d1d1f;
+  color: var(--app-text, #1d1d1f);
 }
 .footer-text {
   margin: 0;
 }
-
-/* Lists/links */
 .footer-list,
 .footer-links {
   list-style: none;
@@ -171,24 +248,10 @@ main,
 }
 .footer-link:hover {
   text-decoration: underline;
-  color: #1d1d1f;
+  color: var(--app-text, #1d1d1f);
 }
 
-/* Row 2: divider + centered copy */
-.footer-bottom {
-  margin-top: 12px;
-}
-.footer-divider {
-  border: 0;
-  border-top: 1px solid #e0e0e0;
-  margin: 10px 0;
-}
-.footer-copy {
-  text-align: center;
-  font-size: 0.85rem;
-}
-
-/* Mobile polish */
+/* Responsive polish */
 @media (max-width: 768px) {
   .footer-inner {
     padding: 12px 16px;
@@ -201,5 +264,3 @@ main,
     text-align: left;
   }
 }
-
-// FOOTER SETTING - end
