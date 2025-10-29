@@ -1,8 +1,8 @@
 // components/layout/PageContainer.tsx
-import React from "react";
-export function PageContainer({ children, className = "" }) {
+"use client";
+export function PageContainer({ children }) {
   return (
-    <div className={`page-container ${className}`} data-theme="carbon-g10">
+    <div className="page-container">
       {children}
     </div>
   );
