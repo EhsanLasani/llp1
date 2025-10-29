@@ -1,17 +1,14 @@
 // app/layout.tsx
 import AppContainer from "@/components/containers/AppContainer";
 import DevToolsPanel from "@/components/dev/DevToolsPanel";
+import type { ReactNode } from "react";
 
 const approvedTheme = process.env.NEXT_PUBLIC_THEME_NAME || "apple";
 const approvedMode =
   (process.env.NEXT_PUBLIC_THEME_MODE as "light" | "dark" | "system") ||
   "light";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>

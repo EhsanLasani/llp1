@@ -1,6 +1,6 @@
 "use client";
-//Right-side self-hiding panel + FAB toggle.
-import React, { useEffect, useMemo, useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import useIsDev from "@/hooks/useIsDev";
 import { getSystemMode, resolveThemeByName } from "@/lib/theme/loader";
 import { applyCSSVariables } from "@/lib/theme/adapter";
@@ -13,7 +13,6 @@ import {
   ThemeOverrides,
 } from "@/lib/theme/overrides";
 
-// Light UI without any external UI libs for portability
 const panelStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,
@@ -31,12 +30,9 @@ const panelStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
 };
+const openStyle: React.CSSProperties = { transform: "translateX(0)" };
 
-const openStyle: React.CSSProperties = {
-  transform: "translateX(0)",
-};
-
-const FabBtn: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+const Fab: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <button
     onClick={onClick}
     style={{
@@ -61,7 +57,6 @@ const FabBtn: React.FC<{ onClick: () => void }> = ({ onClick }) => (
 );
 
 type Mode = "light" | "dark" | "system";
-
 const Themes = [
   "apple",
   "fluent",
@@ -75,26 +70,56 @@ const Themes = [
   "audi",
 ] as const;
 
+// safe localStorage helpers
+const canUseBrowserStorage = () =>
+  typeof window !== "undefined" && "localStorage" in window;
+
+function getLS(key: string, fallback: string) {
+  if (!canUseBrowserStorage()) return fallback;
+  try {
+    const v = window.localStorage.getItem(key);
+    return v ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setLS(key: string, value: string) {
+  if (!canUseBrowserStorage()) return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {}
+}
+
 export default function DevToolsPanel({
   themeUrl = "/themes.json",
 }: {
   themeUrl?: string;
 }) {
   const isDev = useIsDev();
+
+  // 1) Initialize with safe defaults (no localStorage in render)
   const [open, setOpen] = useState(false);
+  const [themeName, setThemeName] = useState<string>("apple");
+  const [mode, setMode] = useState<Mode>("light");
+  const [ov, setOv] = useState<ThemeOverrides>({});
+  const [scale, setScale] = useState<number>(1);
 
-  const [themeName, setThemeName] = useState<string>(
-    () => localStorage.getItem("theme:name") || "apple"
-  );
-  const [mode, setMode] = useState<Mode>(
-    () => (localStorage.getItem("theme:mode") as Mode) || "light"
-  );
-  const [ov, setOv] = useState<ThemeOverrides>(() => loadOverrides());
-  const [scale, setScale] = useState<number>(ov.scaleFactor ?? 1);
-
+  // 2) Hydrate from localStorage on client
   useEffect(() => {
     if (!isDev) return;
-    // apply current selection on mount or changes
+    const initialTheme = getLS("theme:name", "apple");
+    const initialMode = (getLS("theme:mode", "light") as Mode) || "light";
+    const initialOverrides = loadOverrides();
+    setThemeName(initialTheme);
+    setMode(initialMode);
+    setOv(initialOverrides);
+    setScale(initialOverrides.scaleFactor ?? 1);
+  }, [isDev]);
+
+  // 3) Apply theme every time controls change
+  useEffect(() => {
+    if (!isDev) return;
     (async () => {
       const effective = mode === "system" ? getSystemMode() : mode;
       const base = await resolveThemeByName(themeName, effective, {
@@ -105,6 +130,8 @@ export default function DevToolsPanel({
       applyCSSVariables(merged);
     })();
   }, [isDev, themeName, mode, ov, themeUrl]);
+
+  if (!isDev) return null;
 
   const handleOverride = (k: keyof ThemeOverrides, v: string | number) => {
     const next = { ...ov, [k]: v as any };
@@ -133,12 +160,9 @@ export default function DevToolsPanel({
     downloadJson(`${themeName}-${effective}-merged.json`, merged);
   };
 
-  if (!isDev) return null;
-
   return (
     <>
-      <FabBtn onClick={() => setOpen(true)} />
-
+      <Fab onClick={() => setOpen(true)} />
       <aside
         style={{ ...panelStyle, ...(open ? openStyle : {}) }}
         aria-hidden={!open}
@@ -155,7 +179,6 @@ export default function DevToolsPanel({
           <strong>Theme DevTools</strong>
           <button
             onClick={() => setOpen(false)}
-            aria-label="Close"
             style={{
               border: "1px solid #e0e0e0",
               background: "#fff",
@@ -169,14 +192,14 @@ export default function DevToolsPanel({
         </div>
 
         <div style={{ padding: 16, overflow: "auto" }}>
-          {/* Theme selection */}
-          <label style={{ display: "block", margin: "8px 0 4px" }}>Theme</label>
+          {/* Theme */}
+          <label>Theme</label>
           <select
             value={themeName}
             onChange={(e) => {
               const n = e.target.value;
               setThemeName(n);
-              localStorage.setItem("theme:name", n);
+              setLS("theme:name", n);
             }}
             style={{ width: "100%", padding: 8 }}
           >
@@ -188,13 +211,13 @@ export default function DevToolsPanel({
           </select>
 
           {/* Mode */}
-          <label style={{ display: "block", margin: "12px 0 4px" }}>Mode</label>
+          <label style={{ marginTop: 12 }}>Mode</label>
           <select
             value={mode}
             onChange={(e) => {
               const m = e.target.value as Mode;
               setMode(m);
-              localStorage.setItem("theme:mode", m);
+              setLS("theme:mode", m);
             }}
             style={{ width: "100%", padding: 8 }}
           >
@@ -231,8 +254,8 @@ export default function DevToolsPanel({
               <label>Regular</label>
               <input
                 type="number"
-                value={ov.weightRegular ?? ""}
                 placeholder="400"
+                value={ov.weightRegular ?? ""}
                 onChange={(e) =>
                   handleOverride(
                     "weightRegular",
@@ -246,8 +269,8 @@ export default function DevToolsPanel({
               <label>Medium</label>
               <input
                 type="number"
-                value={ov.weightMedium ?? ""}
                 placeholder="500"
+                value={ov.weightMedium ?? ""}
                 onChange={(e) =>
                   handleOverride(
                     "weightMedium",
@@ -261,8 +284,8 @@ export default function DevToolsPanel({
               <label>Bold</label>
               <input
                 type="number"
-                value={ov.weightBold ?? ""}
                 placeholder="700"
+                value={ov.weightBold ?? ""}
                 onChange={(e) =>
                   handleOverride(
                     "weightBold",
@@ -285,9 +308,9 @@ export default function DevToolsPanel({
             ["primaryContrast", "Primary contrast"],
             ["border", "Border"],
             ["link", "Link"],
-          ].map(([key, label]) => (
+          ].map(([k, label]) => (
             <div
-              key={key}
+              key={k}
               style={{
                 display: "grid",
                 gridTemplateColumns: "110px 1fr",
@@ -300,10 +323,10 @@ export default function DevToolsPanel({
               <input
                 type="text"
                 placeholder="#RRGGBB or rgba()"
-                value={(ov as any)[key] ?? ""}
+                value={(ov as any)[k] ?? ""}
                 onChange={(e) =>
                   handleOverride(
-                    key as keyof ThemeOverrides,
+                    k as keyof ThemeOverrides,
                     e.target.value || (undefined as any)
                   )
                 }
@@ -341,9 +364,8 @@ export default function DevToolsPanel({
           </div>
 
           <p style={{ marginTop: 12, fontSize: 12, color: "#666" }}>
-            Dev-only. To ship to production: set approved theme in{" "}
-            <code>NEXT_PUBLIC_THEME_NAME</code> and mode in{" "}
-            <code>NEXT_PUBLIC_THEME_MODE</code>, and disable this panel.
+            Dev-only. Set <code>NEXT_PUBLIC_ENABLE_DEVTOOLS=false</code> to
+            disable in production.
           </p>
         </div>
       </aside>
