@@ -33,19 +33,30 @@ export async function loadThemesFromUrl(url: string): Promise<ThemeTokens[]> {
  * Resolve a theme by name + mode.
  * If not in registry and a fallbackUrl is provided, try loading and resolve again.
  */
-export async function resolveThemeByName(
-  name: ThemeName,
-  mode: ThemeMode = "light",
-  options?: { fallbackUrl?: string }
-): Promise<ResolvedTheme | undefined> {
-  let t = getTheme(name);
-  if (!t && options?.fallbackUrl) {
-    const loaded = await loadThemesFromUrl(options.fallbackUrl);
-    t = loaded.find((x) => x.name === name);
-  }
-  return t ? mergeTheme(t, mode) : undefined;
-}
 
+import { deriveDarkPalette } from "./derive";
+// ...
+export async function resolveThemeByName(
+  name: string,
+  mode: "light" | "dark" | "system",
+  opts?: { fallbackUrl?: string }
+) {
+  // load themes.json → find theme
+  // const theme = { light: Palette, dark?: Palette, ... }
+
+  const effective = mode === "system" ? getSystemMode() : mode;
+  const base =
+    effective === "dark"
+      ? theme.dark ?? deriveDarkPalette(theme.light)
+      : theme.light;
+
+  return {
+    ...theme,
+    ...base, // palette fields
+    mode: effective,
+    name,
+  };
+}
 /**
  * Utility to detect system dark mode.
  */

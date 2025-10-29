@@ -25,35 +25,28 @@ export default function HeaderContainer() {
       render={() => (
         <CarbonHeader aria-label="La-sani" className="custom-header">
           <SkipToContent />
+          {/* Centering wrapper */}
+          <div className="cw header-inner">
+            <HeaderName href="/" prefix="">
+              <img src="/images/logo.png" alt="La-sani" className="brand" />
+              <span className="brand-text">La-sani</span>
+            </HeaderName>
 
-          <HeaderName
-            href="/"
-            prefix=""
-            className="logo-tight"
-            aria-label="La-sani"
-          >
-            <img
-              src="/images/logo.png"
-              alt="La-sani"
-              style={{ height: 28, verticalAlign: "middle", marginRight: 8 }}
-            />
-            <span className="brand-text">La-sani</span>
-          </HeaderName>
+            <HeaderNavigation aria-label="Main" className="nav">
+              <HeaderMenuItem href="#">Home</HeaderMenuItem>
+              <HeaderMenuItem href="#">Products</HeaderMenuItem>
+              <HeaderMenuItem href="#">Services</HeaderMenuItem>
+              <HeaderMenuItem href="#">Insights</HeaderMenuItem>
+              <HeaderMenuItem href="#">About</HeaderMenuItem>
+              <HeaderMenuItem href="#">Contact</HeaderMenuItem>
+            </HeaderNavigation>
 
-          <HeaderNavigation aria-label="Primary">
-            <HeaderMenuItem href="#">Home</HeaderMenuItem>
-            <HeaderMenuItem href="#">Products</HeaderMenuItem>
-            <HeaderMenuItem href="#">Services</HeaderMenuItem>
-            <HeaderMenuItem href="#">Insights</HeaderMenuItem>
-            <HeaderMenuItem href="#">About</HeaderMenuItem>
-            <HeaderMenuItem href="#">Contact</HeaderMenuItem>
-          </HeaderNavigation>
-
-          <HeaderGlobalBar>
-            <HeaderGlobalAction aria-label="Search">
-              <Search size={20} />
-            </HeaderGlobalAction>
-          </HeaderGlobalBar>
+            <HeaderGlobalBar>
+              <HeaderGlobalAction aria-label="Search">
+                <Search size={20} />
+              </HeaderGlobalAction>
+            </HeaderGlobalBar>
+          </div>
         </CarbonHeader>
       )}
     />

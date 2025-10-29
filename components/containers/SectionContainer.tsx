@@ -1,23 +1,16 @@
+// components/containers/SectionContainer.tsx
 "use client";
-
-/**
- * SectionContainer
- * - Generic content section with optional heading
- */
-
 import React from "react";
+type Tone = "default" | "raised" | "contrast" | "brand";
 
 export default function SectionContainer({
-  heading,
   children,
-}: {
-  heading?: string;
-  children: React.ReactNode;
-}) {
+  tone = "default",
+  className = "",
+}: React.PropsWithChildren<{ tone?: Tone; className?: string }>) {
   return (
-    <section className="section">
-      {heading && <h2 className="section-title">{heading}</h2>}
-      {children}
+    <section className={`section tone-${tone} ${className}`}>
+      <div className="cw">{children}</div>
     </section>
   );
 }

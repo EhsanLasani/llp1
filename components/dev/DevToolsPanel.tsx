@@ -20,7 +20,7 @@ const panelStyle: React.CSSProperties = {
   width: 360,
   maxWidth: "90vw",
   height: "100vh",
-  background: "#fff",
+  background: "rgba(127, 228, 153, 1)",
   color: "#111",
   borderLeft: "1px solid #e5e5ea",
   boxShadow: "0 0 24px rgba(0,0,0,.18)",
@@ -39,17 +39,16 @@ const Fab: React.FC<{ onClick: () => void }> = ({ onClick }) => (
       position: "fixed",
       right: 16,
       bottom: 16,
-      zIndex: 2100,
-      width: 52,
-      height: 52,
-      borderRadius: 26,
-      border: "1px solid #e0e0e0",
-      background: "#fff",
-      boxShadow: "0 6px 18px rgba(0,0,0,.16)",
+      zIndex: 999999, // was 2100
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      border: "2px solid #ff3b30",
+      background: "rgba(38, 30, 68, 1)",
+      boxShadow: "0 8px 24px rgba(0,0,0,.25)",
       cursor: "pointer",
-      fontWeight: 600,
+      fontWeight: 700,
     }}
-    aria-label="Open DevTools"
     title="Theme DevTools"
   >
     ⚙️
@@ -370,5 +369,53 @@ export default function DevToolsPanel({
         </div>
       </aside>
     </>
+  );
+}
+// inside DevToolsPanel color render loop
+function ColorRow({
+  keyName,
+  label,
+  value,
+  onChange,
+}: {
+  keyName: string;
+  label: string;
+  value?: string;
+  onChange: (v: string) => void;
+}) {
+  const safe =
+    value && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value) ? value : "#000000";
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "110px 1fr 40px",
+        gap: 8,
+        alignItems: "center",
+        marginBottom: 8,
+      }}
+    >
+      <label>{label}</label>
+      <input
+        type="text"
+        placeholder="#RRGGBB or rgba()"
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        style={{ width: "100%", padding: 6 }}
+      />
+      <input
+        type="color"
+        value={safe}
+        onChange={(e) => onChange(e.target.value)}
+        title={keyName}
+        style={{
+          width: 40,
+          height: 32,
+          padding: 0,
+          border: "1px solid #e0e0e0",
+          background: "#fff",
+        }}
+      />
+    </div>
   );
 }

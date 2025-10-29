@@ -9,6 +9,7 @@
 :root {
   --app-header-height: 56px; /* tune to your header/logo */
   --app-footer-height: 80px; /* fallback; will be updated dynamically */
+  --content-max: 1112px;
 }
 
 /* ---- Base document / Theme consumption ---- */
@@ -263,4 +264,70 @@ main,
   .footer-copy {
     text-align: left;
   }
+}
+.cw {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  width: 100%;
+}
+/* Theme binding */
+.cds--header.custom-header {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+
+  .header-inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand {
+    height: 24px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .brand-text {
+    font-weight: 600;
+  }
+  .nav .cds--header__menu-item {
+    padding-inline: 12px;
+  }
+}
+/* globals.scss */
+/* Section tones mapped to theme vars */
+.section {
+  padding: 32px 0;
+}
+.section.tone-default {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.section.tone-raised {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.section.tone-contrast {
+  background: var(--color-surface-contrast, #0f1113);
+  color: var(--color-contrast-text, #fff);
+}
+.section.tone-brand {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.hero {
+  background: var(--color-surface);
+  padding: 36px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.hero h1 {
+  margin: 0 0 8px;
+  line-height: 1.15;
+}
+.hero p.lead {
+  margin: 0;
+  opacity: 0.8;
 }

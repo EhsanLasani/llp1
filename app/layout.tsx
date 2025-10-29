@@ -1,7 +1,6 @@
-// app/layout.tsx
-import AppContainer from "@/components/containers/AppContainer";
-import DevToolsPanel from "@/components/dev/DevToolsPanel";
 import type { ReactNode } from "react";
+import AppContainer from "@/components/containers/AppContainer";
+import DevtoolsRoot from "@/components/dev/DevtoolsRoot"; // ⬅️ client wrapper
 
 const approvedTheme = process.env.NEXT_PUBLIC_THEME_NAME || "apple";
 const approvedMode =
@@ -16,12 +15,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           themeUrl="/themes.json"
           themeName={approvedTheme}
           themeMode={approvedMode}
-          headerHeight={56}
+          headerHeight={Number(process.env.NEXT_PUBLIC_HEADER_HEIGHT ?? 56)}
         >
           {children}
-          {/* Dev panel renders only if NEXT_PUBLIC_ENABLE_DEVTOOLS=true and not production */}
-          <DevToolsPanel />
         </AppContainer>
+
+        {/* Mount outside AppContainer; client-only */}
+        <DevtoolsRoot />
       </body>
     </html>
   );

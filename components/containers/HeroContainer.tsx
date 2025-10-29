@@ -1,21 +1,11 @@
+// components/containers/HeroContainer.tsx
 "use client";
+import React from "react";
 
-/**
- * HeroContainer
- * - Simple hero block using theme-driven typography
- */
-
-export default function HeroContainer({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle?: string;
-}) {
+export default function HeroContainer({ children }: React.PropsWithChildren) {
   return (
-    <section className="hero">
-      <h1>{title}</h1>
-      {subtitle && <p className="hero-sub muted">{subtitle}</p>}
-    </section>
+    <header className="hero">
+      <div className="cw">{children}</div>
+    </header>
   );
 }
